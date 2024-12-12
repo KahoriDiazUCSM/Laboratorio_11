@@ -1,0 +1,242 @@
+/**************************************************************************************
+* NOMBRE: Command.java
+* DESCRIPCIÓN: Define la interfaz Command para implementar comandos genéricos.
+**************************************************************************************/
+interface Command {
+    void execute(); 
+    void undo();    
+}
+
+/**************************************************************************************
+* NOMBRE: Luz.java
+* DESCRIPCIÓN: Representa el dispositivo Luz con métodos para encender y apagar.
+**************************************************************************************/
+class Luz {
+    public void encender() {
+        System.out.println("Luz encendida");
+    }
+
+    public void apagar() {
+        System.out.println("Luz apagada");
+    }
+}
+
+/**************************************************************************************
+* NOMBRE: Ventilador.java
+* DESCRIPCIÓN: Representa el dispositivo Ventilador con métodos para encender y apagar.
+**************************************************************************************/
+class Ventilador {
+    public void encender() {
+        System.out.println("Ventilador encendido");
+    }
+
+    public void apagar() {
+        System.out.println("Ventilador apagado");
+    }
+}
+
+/**************************************************************************************
+* NOMBRE: AireAcondicionado.java
+* DESCRIPCIÓN: Representa el dispositivo Aire Acondicionado con métodos para encender y apagar.
+**************************************************************************************/
+class AireAcondicionado {
+    public void encender() {
+        System.out.println("Aire acondicionado encendido");
+    }
+
+    public void apagar() {
+        System.out.println("Aire acondicionado apagado");
+    }
+}
+
+/**************************************************************************************
+* NOMBRE: EncenderLuz.java
+* DESCRIPCIÓN: Implementa Command para encender una Luz.
+**************************************************************************************/
+class EncenderLuz implements Command {
+    private Luz luz;
+
+    public EncenderLuz(Luz luz) {
+        this.luz = luz;
+    }
+
+    @Override
+    public void execute() {
+        luz.encender();
+    }
+
+    @Override
+    public void undo() {
+        luz.apagar();
+    }
+}
+
+/**************************************************************************************
+* NOMBRE: ApagarLuz.java
+* DESCRIPCIÓN: Implementa Command para apagar una Luz.
+**************************************************************************************/
+class ApagarLuz implements Command {
+    private Luz luz;
+
+    public ApagarLuz(Luz luz) {
+        this.luz = luz;
+    }
+
+    @Override
+    public void execute() {
+        luz.apagar();
+    }
+
+    @Override
+    public void undo() {
+        luz.encender();
+    }
+}
+
+/**************************************************************************************
+* NOMBRE: EncenderVentilador.java
+* DESCRIPCIÓN: Implementa Command para encender un Ventilador.
+**************************************************************************************/
+class EncenderVentilador implements Command {
+    private Ventilador ventilador;
+
+    public EncenderVentilador(Ventilador ventilador) {
+        this.ventilador = ventilador;
+    }
+
+    @Override
+    public void execute() {
+        ventilador.encender();
+    }
+
+    @Override
+    public void undo() {
+        ventilador.apagar();
+    }
+}
+
+/**************************************************************************************
+* NOMBRE: ApagarVentilador.java
+* DESCRIPCIÓN: Implementa Command para apagar un Ventilador.
+**************************************************************************************/
+class ApagarVentilador implements Command {
+    private Ventilador ventilador;
+
+    public ApagarVentilador(Ventilador ventilador) {
+        this.ventilador = ventilador;
+    }
+
+    @Override
+    public void execute() {
+        ventilador.apagar();
+    }
+
+    @Override
+    public void undo() {
+        ventilador.encender();
+    }
+}
+
+/**************************************************************************************
+* NOMBRE: EncenderAire.java
+* DESCRIPCIÓN: Implementa Command para encender un Aire Acondicionado.
+**************************************************************************************/
+class EncenderAire implements Command {
+    private AireAcondicionado aire;
+
+    public EncenderAire(AireAcondicionado aire) {
+        this.aire = aire;
+    }
+
+    @Override
+    public void execute() {
+        aire.encender();
+    }
+
+    @Override
+    public void undo() {
+        aire.apagar();
+    }
+}
+
+/**************************************************************************************
+* NOMBRE: ApagarAire.java
+* DESCRIPCIÓN: Implementa Command para apagar un Aire Acondicionado.
+**************************************************************************************/
+class ApagarAire implements Command {
+    private AireAcondicionado aire;
+
+    public ApagarAire(AireAcondicionado aire) {
+        this.aire = aire;
+    }
+
+    @Override
+    public void execute() {
+        aire.apagar();
+    }
+
+    @Override
+    public void undo() {
+        aire.encender();
+    }
+}
+
+/**************************************************************************************
+* NOMBRE: ControlRemoto.java
+* DESCRIPCIÓN: Maneja la configuración y ejecución de comandos.
+**************************************************************************************/
+class ControlRemoto {
+    private Command ultimoComando;
+
+    public void setCommand(Command command) {
+        this.ultimoComando = command;
+    }
+
+    public void presionarBoton() {
+        if (ultimoComando != null) {
+            ultimoComando.execute();
+        }
+    }
+
+    // -> Deshace el último comando ejecutado
+    public void deshacerBoton() {
+        if (ultimoComando != null) {
+            ultimoComando.undo();
+        }
+    }
+}
+
+/**************************************************************************************
+* NOMBRE: SistemaControlDispositivos.java
+* DESCRIPCIÓN: Clase principal para probar el sistema de control de dispositivos.
+**************************************************************************************/
+public class SistemaControlDispositivos {
+    public static void main(String[] args) {
+      
+        Luz luz = new Luz();
+        Ventilador ventilador = new Ventilador();
+        AireAcondicionado aire = new AireAcondicionado();
+
+        
+        Command encenderLuz = new EncenderLuz(luz);
+        Command apagarLuz = new ApagarLuz(luz);
+        Command encenderVentilador = new EncenderVentilador(ventilador);
+        Command apagarVentilador = new ApagarVentilador(ventilador);
+        Command encenderAire = new EncenderAire(aire);
+        Command apagarAire = new ApagarAire(aire);
+
+    
+        ControlRemoto control = new ControlRemoto();
+
+        control.setCommand(encenderLuz);
+        control.presionarBoton();   
+        control.deshacerBoton();   
+
+        control.setCommand(encenderVentilador);
+        control.presionarBoton(); 
+        control.deshacerBoton();  
+
+        control.setCommand(encenderAire);
+        control.presionarBoton();   
+        control.deshacerBoton();    
+}
