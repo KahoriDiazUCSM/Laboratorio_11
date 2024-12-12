@@ -1,0 +1,140 @@
+import java.util.HashMap;
+import java.util.Map;
+
+// Interfaz Command
+interface Command {
+    void execute();
+}
+
+// Clase Televisor
+class Televisor {
+    public void encender() {
+        System.out.println("Televisor encendido");
+    }
+
+    public void apagar() {
+        System.out.println("Televisor apagado");
+    }
+
+    public void cambiarCanal(int canal) {
+        System.out.println("Cambiando al canal " + canal);
+    }
+
+    public void subirVolumen() {
+        System.out.println("Subiendo volumen");
+    }
+
+    public void bajarVolumen() {
+        System.out.println("Bajando volumen");
+    }
+}
+
+// Comando para encender el televisor
+class EncenderCommand implements Command {
+    private Televisor tv;
+
+    public EncenderCommand(Televisor tv) {
+        this.tv = tv;
+    }
+
+    @Override
+    public void execute() {
+        tv.encender();
+    }
+}
+
+// Comando para apagar el televisor
+class ApagarCommand implements Command {
+    private Televisor tv;
+
+    public ApagarCommand(Televisor tv) {
+        this.tv = tv;
+    }
+
+    @Override
+    public void execute() {
+        tv.apagar();
+    }
+}
+
+// Comando para cambiar el canal del televisor
+class CambiarCanalCommand implements Command {
+    private Televisor tv;
+    private int canal;
+
+    public CambiarCanalCommand(Televisor tv, int canal) {
+        this.tv = tv;
+        this.canal = canal;
+    }
+
+    @Override
+    public void execute() {
+        tv.cambiarCanal(canal);
+    }
+}
+
+// Comando para subir el volumen del televisor
+class SubirVolumenCommand implements Command {
+    private Televisor tv;
+
+    public SubirVolumenCommand(Televisor tv) {
+        this.tv = tv;
+    }
+
+    @Override
+    public void execute() {
+        tv.subirVolumen();
+    }
+}
+
+// Comando para bajar el volumen del televisor
+class BajarVolumenCommand implements Command {
+    private Televisor tv;
+
+    public BajarVolumenCommand(Televisor tv) {
+        this.tv = tv;
+    }
+
+    @Override
+    public void execute() {
+        tv.bajarVolumen();
+    }
+}
+
+// Clase Control Remoto
+class ControlRemoto {
+    private Map<String, Command> comandos = new HashMap<>();
+
+    public void setComando(String boton, Command comando) {
+        comandos.put(boton, comando);
+    }
+
+    public void presionarBoton(String boton) {
+        Command comando = comandos.get(boton);
+        if (comando != null) {
+            comando.execute();
+        } else {
+            System.out.println("Botón no configurado");
+        }
+    }
+}
+
+// Clase Demo para probar el control remoto
+public class ControlRemotoTVDemo {
+    public static void main(String[] args) {
+        Televisor tv = new Televisor();
+        ControlRemoto control = new ControlRemoto();
+
+        control.setComando("POWER", new EncenderCommand(tv));
+        control.setComando("OFF", new ApagarCommand(tv));
+        control.setComando("CANAL 1", new CambiarCanalCommand(tv, 1));
+        control.setComando("SUBIR VOLUMEN", new SubirVolumenCommand(tv));
+        control.setComando("BAJAR VOLUMEN", new BajarVolumenCommand(tv));
+
+        control.presionarBoton("POWER");
+        control.presionarBoton("CANAL 1");
+        control.presionarBoton("SUBIR VOLUMEN");
+        control.presionarBoton("BAJAR VOLUMEN");
+        control.presionarBoton("OFF");
+    }
+}
