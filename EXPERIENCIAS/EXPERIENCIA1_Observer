@@ -1,0 +1,55 @@
+import java.util.ArrayList;
+import java.util.List;
+
+interface Observer {
+    void update(String message);
+}
+
+class Usuario implements Observer {
+    private String nombre;
+
+    public Usuario(String nombre) {
+        this.nombre = nombre;
+    }
+
+    @Override
+    public void update(String message) {
+        System.out.println(nombre + " recibió la notificación: " + message);
+    }
+}
+
+class SistemaNotificaciones {
+    private List<Observer> observadores = new ArrayList<>();
+
+    public void agregarObservador(Observer observador) {
+        observadores.add(observador);
+    }
+
+    public void eliminarObservador(Observer observador) {
+        observadores.remove(observador);
+    }
+
+    public void notificarTodos(String mensaje) {
+        for (Observer observador : observadores) {
+            observador.update(mensaje);
+        }
+    }
+}
+
+public class SistemaNotificacionesDemo {
+    public static void main(String[] args) {
+        SistemaNotificaciones sistema = new SistemaNotificaciones();
+
+        Usuario usuario1 = new Usuario("Juan");
+        Usuario usuario2 = new Usuario("María");
+
+        sistema.agregarObservador(usuario1);
+        sistema.agregarObservador(usuario2);
+
+        sistema.notificarTodos("Nueva promoción disponible!");
+
+        sistema.eliminarObservador(usuario2);
+
+        sistema.notificarTodos("Actualización de producto");
+    }
+}
