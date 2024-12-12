@@ -1,0 +1,161 @@
+/**************************************************************************************
+* NOMBRE : EstrategiaDescuento.java
+* DESCRIPCIÓN: Interfaz que define el método para calcular el precio final con descuento.
+**************************************************************************************/
+public interface EstrategiaDescuento {
+    double calcularPrecioFinal(List<Producto> productos);
+}
+
+/**************************************************************************************
+* NOMBRE : SinDescuento.java
+* DESCRIPCIÓN: Estrategia de descuento que no aplica ningún descuento.
+**************************************************************************************/
+public class SinDescuento implements EstrategiaDescuento {
+    @Override
+    public double calcularPrecioFinal(List<Producto> productos) {
+        return productos.stream().mapToDouble(Producto::getPrecio).sum();
+    }
+}
+
+/**************************************************************************************
+* NOMBRE : DescuentoFijo.java
+* DESCRIPCIÓN: Estrategia de descuento que aplica un 10% sobre el total.
+**************************************************************************************/
+public class DescuentoFijo implements EstrategiaDescuento {
+    @Override
+    public double calcularPrecioFinal(List<Producto> productos) {
+        double total = productos.stream().mapToDouble(Producto::getPrecio).sum();
+        return total * 0.90; // 10% de descuento
+    }
+}
+
+/**************************************************************************************
+* NOMBRE : DescuentoPorcentual.java
+* DESCRIPCIÓN: Estrategia que aplica un 30% de descuento si hay al menos 2 productos iguales.
+**************************************************************************************/
+public class DescuentoPorcentual implements EstrategiaDescuento {
+    @Override
+    public double calcularPrecioFinal(List<Producto> productos) {
+        double total = 0;
+        for (int i = 0; i < productos.size(); i++) {
+            Producto actual = productos.get(i);
+            long count = productos.stream().filter(p -> p.getNombre().equals(actual.getNombre())).count();
+            if (count >= 2) {
+                total += actual.getPrecio() * 0.70; // 30% de descuento
+                productos.remove(i); // Evita contar el producto dos veces
+                i--; // Ajusta el índice
+            } else {
+                total += actual.getPrecio();
+            }
+        }
+        return total;
+    }
+}
+
+/**************************************************************************************
+* NOMBRE : DescuentoPorcentualAcumulado.java
+* DESCRIPCIÓN: Estrategia que aplica un 50% de descuento al producto más barato si hay al menos 3 productos.
+**************************************************************************************/
+public class DescuentoPorcentualAcumulado implements EstrategiaDescuento {
+    @Override
+    public double calcularPrecioFinal(List<Producto> productos) {
+        double total = productos.stream().mapToDouble(Producto::getPrecio).sum();
+        if (productos.size() >= 3) {
+            double masBarato = productos.stream().mapToDouble(Producto::getPrecio).min().orElse(0);
+            total -= masBarato * 0.50; // 50% de descuento en el más barato
+        }
+        return total;
+    }
+}
+
+/**************************************************************************************
+* NOMBRE : Producto.java
+* DESCRIPCIÓN: Clase que representa un producto con nombre y precio.
+**************************************************************************************/
+public class Producto {
+    private String nombre;
+    private double precio;
+
+    public Producto(String nombre, double precio) {
+        this.nombre = nombre;
+        this.precio = precio;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public double getPrecio() {
+        return precio;
+    }
+
+    @Override
+    public String toString() {
+        return nombre + " S/." + precio;
+    }
+}
+
+/**************************************************************************************
+* NOMBRE : CalculadoraDePrecios.java
+* DESCRIPCIÓN: Clase que aplica una estrategia de descuento seleccionada para calcular el precio final.
+**************************************************************************************/
+public class CalculadoraDePrecios {
+    private EstrategiaDescuento estrategia;
+
+    public void setEstrategia(EstrategiaDescuento estrategia) {
+        this.estrategia = estrategia;
+    }
+
+    public double calcularPrecioFinal(List<Producto> productos) {
+        if (estrategia == null) {
+            throw new IllegalStateException("Estrategia de descuento no seleccionada.");
+        }
+        return estrategia.calcularPrecioFinal(productos);
+    }
+}
+
+/**************************************************************************************
+* NOMBRE : SistemaDeDescuento.java
+* DESCRIPCIÓN: Clase principal que permite seleccionar estrategias de descuento y calcular el precio final.
+**************************************************************************************/
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+public class SistemaDeDescuento {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        List<Producto> productos = new ArrayList<>();
+        productos.add(new Producto("Laptop", 3000));
+        productos.add(new Producto("Laptop", 3000));
+        productos.add(new Producto("Mouse", 150));
+        productos.add(new Producto("Teclado", 200));
+        productos.add(new Producto("Auriculares", 350));
+
+        CalculadoraDePrecios calculadora = new CalculadoraDePrecios();
+
+        System.out.println("Lista de Productos:");
+        productos.forEach(System.out::println);
+
+        System.out.println("\n--- Elige una estrategia de descuento ---");
+        System.out.println("1. Sin Descuento");
+        System.out.println("2. Descuento Fijo (10%)");
+        System.out.println("3. Descuento Porcentual (30% si hay 2 productos iguales)");
+        System.out.println("4. Descuento Porcentual Acumulado (50% sobre el producto más barato si hay al menos 3 productos)");
+
+        int opcion = scanner.nextInt();
+        switch (opcion) {
+            case 1 -> calculadora.setEstrategia(new SinDescuento());
+            case 2 -> calculadora.setEstrategia(new DescuentoFijo());
+            case 3 -> calculadora.setEstrategia(new DescuentoPorcentual());
+            case 4 -> calculadora.setEstrategia(new DescuentoPorcentualAcumulado());
+            default -> {
+                System.out.println("Opción no válida.");
+                return;
+            }
+        }
+
+        double precioFinal = calculadora.calcularPrecioFinal(new ArrayList<>(productos));
+        System.out.println("\n--- Precio Final: S/." + precioFinal);
+    }
+}
