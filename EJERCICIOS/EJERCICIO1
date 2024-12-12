@@ -1,0 +1,90 @@
+import java.util.ArrayList;
+import java.util.List;
+
+/**************************************************************************************
+* NOMBRE : Observer.java
+* DESCRIPCIÓN: Interfaz Observer -> Define el método update() para que las clases suscriptoras
+* reciban notificaciones automáticas de cambios en el estado del sujeto observado.
+**************************************************************************************/
+interface Observer {
+    void update(String mensaje);
+}
+
+/**************************************************************************************
+* NOMBRE : Notificacion.java
+* DESCRIPCIÓN: Clase Notificacion -> Actúa como el sujeto observado. Permite suscribir, 
+* desuscribir y notificar a los observadores registrados.
+**************************************************************************************/
+class Notificacion {
+    private List<Observer> observers = new ArrayList<>();
+
+    // Agregar un suscriptor
+    public void agregarSuscriptor(Observer observer) {
+        observers.add(observer);
+        System.out.println("Usuario suscrito.");
+    }
+
+    // Remover un suscriptor
+    public void eliminarSuscriptor(Observer observer) {
+        observers.remove(observer);
+        System.out.println("Usuario desuscrito.");
+    }
+
+    // Notificar a todos los suscriptores
+    public void notificar(String mensaje) {
+        for (Observer observer : observers) {
+            observer.update(mensaje);
+        }
+    }
+}
+
+/**************************************************************************************
+* NOMBRE : Usuario.java
+* DESCRIPCIÓN: Clase Usuario -> Representa un usuario que se puede suscribir al sistema 
+* de notificaciones y recibir mensajes automáticamente.
+**************************************************************************************/
+class Usuario implements Observer {
+    private String nombre;
+
+    public Usuario(String nombre) {
+        this.nombre = nombre;
+    }
+
+    @Override
+    public void update(String mensaje) {
+        System.out.println(nombre + " recibió la notificación: " + mensaje);
+    }
+}
+
+/**************************************************************************************
+* NOMBRE : SistemaNotificaciones.java
+* DESCRIPCIÓN: Clase principal que implementa el sistema de notificaciones utilizando 
+* el patrón Observer. Permite probar las funcionalidades de suscripción, desuscripción 
+* y notificación dinámica.
+**************************************************************************************/
+public class SistemaNotificaciones {
+    public static void main(String[] args) {
+        // Crear el sujeto observado
+        Notificacion notificacion = new Notificacion();
+
+        // Crear observadores (usuarios)
+        Usuario usuario1 = new Usuario("Sebastián");
+        Usuario usuario2 = new Usuario("Joaquín");
+
+        // Suscribir usuarios
+        notificacion.agregarSuscriptor(usuario1);
+        notificacion.agregarSuscriptor(usuario2);
+
+        // Enviar notificación a todos los suscriptores
+        System.out.println("\nEnviando notificación...");
+        notificacion.notificar("Nueva promoción en tecnología!");
+
+        // Desuscribir un usuario
+        System.out.println("\nDesuscribiendo a Joaquín...");
+        notificacion.eliminarSuscriptor(usuario2);
+
+        // Enviar notificación después de la desuscripción
+        System.out.println("\nEnviando notificación...");
+        notificacion.notificar("Actualización en productos disponibles.");
+    }
+}
