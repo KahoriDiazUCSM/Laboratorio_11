@@ -1,0 +1,127 @@
+import java.util.Scanner;
+
+interface EstrategiaDescuento {
+    double aplicarDescuento(double precio);
+}
+
+class SinDescuento implements EstrategiaDescuento {
+    @Override
+    public double aplicarDescuento(double precio) {
+        return precio;
+    }
+}
+
+class DescuentoFijo implements EstrategiaDescuento {
+    @Override
+    public double aplicarDescuento(double precio) {
+        return precio - 10;
+    }
+}
+
+class DescuentoPorcentual implements EstrategiaDescuento {
+    private int cantidad;
+
+    public DescuentoPorcentual(int cantidad) {
+        this.cantidad = cantidad;
+    }
+
+    @Override
+    public double aplicarDescuento(double precio) {
+        if (cantidad >= 2) {
+            return precio * 0.7;
+        }
+        return precio;
+    }
+}
+
+class DescuentoPorcentualAcumulado implements EstrategiaDescuento {
+    private int cantidad;
+
+    public DescuentoPorcentualAcumulado(int cantidad) {
+        this.cantidad = cantidad;
+    }
+
+    @Override
+    public double aplicarDescuento(double precio) {
+        if (cantidad >= 3) {
+            return precio * 0.5;
+        }
+        return precio;
+    }
+}
+
+class Producto {
+    private String nombre;
+    private double precio;
+
+    public Producto(String nombre, double precio) {
+        this.nombre = nombre;
+        this.precio = precio;
+    }
+
+    public double getPrecio() {
+        return precio;
+    }
+}
+
+class CalculadoraDePrecios {
+    private EstrategiaDescuento estrategia;
+
+    public void setEstrategia(EstrategiaDescuento estrategia) {
+        this.estrategia = estrategia;
+    }
+
+    public double calcularPrecioFinal(Producto producto) {
+        return estrategia.aplicarDescuento(producto.getPrecio());
+    }
+}
+
+public class SistemaDescuentosDemo {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        CalculadoraDePrecios calculadora = new CalculadoraDePrecios();
+        Producto producto = new Producto("Camiseta", 100);
+
+        while (true) {
+            System.out.println("\nSeleccione una estrategia de descuento:");
+            System.out.println("1. Sin descuento");
+            System.out.println("2. Descuento fijo ($10)");
+            System.out.println("3. Descuento porcentual (30% para 2 o más productos)");
+            System.out.println("4. Descuento porcentual acumulado (50% para 3 o más productos)");
+            System.out.println("5. Salir");
+
+            int opcion = scanner.nextInt();
+
+            if (opcion == 5) break;
+
+            EstrategiaDescuento estrategia;
+            switch (opcion) {
+                case 1:
+                    estrategia = new SinDescuento();
+                    break;
+                case 2:
+                    estrategia = new DescuentoFijo();
+                    break;
+                case 3:
+                    System.out.println("Ingrese la cantidad de productos:");
+                    int cantidad = scanner.nextInt();
+                    estrategia = new DescuentoPorcentual(cantidad);
+                    break;
+                case 4:
+                    System.out.println("Ingrese la cantidad de productos:");
+                    cantidad = scanner.nextInt();
+                    estrategia = new DescuentoPorcentualAcumulado(cantidad);
+                    break;
+                default:
+                    System.out.println("Opción no válida");
+                    continue;
+            }
+
+            calculadora.setEstrategia(estrategia);
+            double precioFinal = calculadora.calcularPrecioFinal(producto);
+            System.out.println("Precio final: $" + precioFinal);
+        }
+
+        scanner.close();
+    }
+}
